@@ -2,6 +2,7 @@
 
 #Import Libraries
 import pygame
+import math
 import random
 pygame.init()
 
@@ -13,17 +14,17 @@ class player:
         self.y = 400
         self.xvelocity = 0
         self.yvelocity = 0
-        self.direction = 360
+        self.direction = 45
 
     def leftturn(self):
-        self.direction -= 1
-        if self.direction < 0:
-            self.direction = 360
+        self.direction -= 3
+        if self.direction <= 0:
+            self.direction += 360
 
     def rightturn(self):
-        self.direction += 1
+        self.direction += 3
         if self.direction > 360:
-            self.direction = 0
+            self.direction -= 360
 
     def thrust(self):
         #Make this thrust the player in the direction they are facing with math
@@ -82,9 +83,42 @@ def calculate(screen, background_colour, character):
     screen.fill(background_colour)
 
     #Draw Player
-    playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((character.x - 10, character.y - 10), (character.x + 10, character.y - 10), (character.x, character.y - 40)))
+    #How far is each point from the center point
+    point1dist = 10
+    point1arm = character.direction + 135
+    if point1arm > 360:
+        point1arm -= 360
+    point2dist = 10
+    point2arm = character.direction - 135
+    if point2arm <= 0:
+        point2arm += 360
+    point3dist = 40
+
+    referenceangle = findreferneceangle(character.direction)
+
+    #Calculate Point 3
+    point3x = character.x + (math.cos(math.radians(referenceangle)) * point3dist)
+    point3y = character.y - (math.sin(math.radians(referenceangle)) * point3dist)
+    playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((character.x - 10, character.y - 10), (character.x + 10, character.y - 10), (point3x, point3y)))
 
     pygame.display.update()
+
+def findreferneceangle(angle):
+    #Find the Reference Angle
+    if angle > 0 and angle <= 90:
+        #Quadrant 1
+        referenceangle = angle
+    elif angle  > 90 and angle <= 180:
+        #Quadrant 2
+        referenceangle = 180 - angle
+    elif angle > 180 and angle <= 270:
+        #Quadrant 3
+        referenceangle = angle - 180
+    elif angle > 270 and angle <= 360:
+        #Quadrant 4
+        referenceangle = 360 - angle
+
+    return referenceangle
 
 #Call main() to Start Program
 main()
