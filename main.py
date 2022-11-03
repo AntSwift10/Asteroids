@@ -5,6 +5,39 @@ import pygame
 import random
 pygame.init()
 
+#Classes
+#Player Character
+class player:
+    def __init__(self):
+        self.x = 400
+        self.y = 400
+        self.xvelocity = 0
+        self.yvelocity = 0
+        self.direction = 360
+
+    def leftturn(self):
+        self.direction -= 1
+        if self.direction < 0:
+            self.direction = 360
+
+    def rightturn(self):
+        self.direction += 1
+        if self.direction > 360:
+            self.direction = 0
+
+    def thrust(self):
+        #Make this thrust the player in the direction they are facing with math
+        pass
+
+#Asteroid
+class asteroid:
+    def __init__(self, size):
+        self.size = size
+
+    def shatter(self):
+        #Create more, Smaller Asteroids
+        pass
+
 #Functions
 def main():
     #Create Display
@@ -15,6 +48,10 @@ def main():
     #This is to Reset after a Gameover
     cont = True
     while cont:
+        #Create Player
+        character = player()
+
+        #Create Clock
         clock = pygame.time.Clock()
         tickcounter = 0
         tickspeed = 1
@@ -37,13 +74,15 @@ def main():
             #Cap FPS to 30
             clock.tick(30)
 
+            #Do Calculations
+            calculate(screen, background_colour, character)
             tickcounter += tickspeed
 
-            #Update Screen
-            draw(screen, background_colour)
-
-def draw(screen, background_colour):
+def calculate(screen, background_colour, character):
     screen.fill(background_colour)
+
+    #Draw Player
+    playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((character.x - 10, character.y - 10), (character.x + 10, character.y - 10), (character.x, character.y - 40)))
 
     pygame.display.update()
 
