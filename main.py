@@ -29,7 +29,6 @@ class player:
             self.direction += 360
 
     def thrust(self):
-        #Make this thrust the player in the direction they are facing with math
         referenceangle, xquad, yquad = findreferneceangle(self.direction)
         self.xvelocity += (math.cos(math.radians(referenceangle)) * xquad * self.velocitymult)
         self.yvelocity -= (math.sin(math.radians(referenceangle)) * yquad * self.velocitymult)
@@ -39,8 +38,11 @@ class player:
         self.y += self.yvelocity
 
     def brake(self):
-        #Make this slow the Player Down
-        pass
+        referenceangle, xquad, yquad = findreferneceangle(self.direction)
+        if self.xvelocity * xquad < 0:
+            self.xvelocity *= (math.cos(math.radians(referenceangle)) * xquad)
+        if self.yvelocity * yquad < 0:
+            self.yvelocity *= (math.sin(math.radians(referenceangle)) * yquad)
 
     def fire(self):
         #Make this Fire off Bullets
@@ -147,6 +149,8 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
         character.rightturn()
     if thrusting:
         character.thrust()
+    if braking:
+        character.brake()
 
     #Move Player
     character.updatelocation()
