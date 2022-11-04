@@ -12,6 +12,7 @@ class player:
     def __init__(self):
         self.x = 400
         self.y = 400
+        self.velocitymult = 0.1
         self.xvelocity = 0
         self.yvelocity = 0
         self.direction = 90
@@ -29,7 +30,13 @@ class player:
 
     def thrust(self):
         #Make this thrust the player in the direction they are facing with math
-        pass
+        referenceangle, xquad, yquad = findreferneceangle(self.direction)
+        self.xvelocity += (math.cos(math.radians(referenceangle)) * xquad * self.velocitymult)
+        self.yvelocity -= (math.sin(math.radians(referenceangle)) * yquad * self.velocitymult)
+
+    def updatelocation(self):
+        self.x += self.xvelocity
+        self.y += self.yvelocity
 
     def brake(self):
         #Make this slow the Player Down
@@ -69,7 +76,7 @@ def main():
         leftpressed = False
         rightpressed = False
         thrusting = False
-        Braking = False
+        braking = False
         firing = False
         #Create Player
         character = player()
@@ -128,16 +135,21 @@ def main():
             clock.tick(30)
 
             #Do Calculations
-            calculate(screen, background_colour, character, leftpressed, rightpressed, firing)
+            calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing)
             tickcounter += tickspeed
 
-def calculate(screen, background_colour, character, leftpressed, rightpressed, firing):
+def calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing):
     screen.fill(background_colour)
     #Calculate Movement
     if leftpressed:
         character.leftturn()
     if rightpressed:
         character.rightturn()
+    if thrusting:
+        character.thrust()
+
+    #Move Player
+    character.updatelocation()
 
     #Draw Player
     #How far is each point from the center point
