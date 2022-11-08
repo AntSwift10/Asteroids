@@ -19,6 +19,9 @@ class player:
         self.yvelocity = 0
         self.direction = 90
         self.rotatespeed = 5
+        self.point1dist = 10
+        self.point2dist = 10
+        self.point3dist = 20
 
     def leftturn(self):
         self.direction += self.rotatespeed
@@ -54,7 +57,13 @@ class player:
             self.yvelocity *= self.brakerate
 
     def fire(self, bulletlist):
-        bulletlist.append(bullet(10, 0, 300, 300))
+        #X Velocity, Y Velocity, X, Y
+        referenceangle, xquad, yquad = findreferneceangle(self.direction)#Find the Reference angle and Quadrant
+        xvelocity = math.cos(math.radians(referenceangle)) * (self.point3dist - 4) * xquad#Find Speed
+        yvelocity = math.sin(math.radians(referenceangle)) * (self.point3dist - 4) * yquad
+        pointx = self.x + xvelocity#Determine the Location of X and Y of points
+        pointy = self.y - yvelocity
+        bulletlist.append(bullet((1 * xvelocity), (-1 * yvelocity), pointx, pointy))
         return bulletlist
 
 #Bullets shot from Player
@@ -175,30 +184,27 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
 
     #Draw Player
     #How far is each point from the center point
-    point1dist = 10
     point1arm = character.direction + 135
     if point1arm > 360:
         point1arm -= 360
-    point2dist = 10
     point2arm = character.direction - 135
     if point2arm <= 0:
         point2arm += 360
-    point3dist = 30
 
     #Calculate Point 1
     referenceangle, xquad, yquad = findreferneceangle(point1arm)#Find the Reference angle and Quadrant
-    point1x = character.x + (math.cos(math.radians(referenceangle)) * point1dist * xquad)#Determine the Location of X and Y of points
-    point1y = character.y - (math.sin(math.radians(referenceangle)) * point1dist * yquad)
+    point1x = character.x + (math.cos(math.radians(referenceangle)) * character.point1dist * xquad)#Determine the Location of X and Y of points
+    point1y = character.y - (math.sin(math.radians(referenceangle)) * character.point1dist * yquad)
 
     #Calculate Point 2
     referenceangle, xquad, yquad = findreferneceangle(point2arm)#Find the Reference angle and Quadrant
-    point2x = character.x + (math.cos(math.radians(referenceangle)) * point2dist * xquad)#Determine the Location of X and Y of points
-    point2y = character.y - (math.sin(math.radians(referenceangle)) * point2dist * yquad)
+    point2x = character.x + (math.cos(math.radians(referenceangle)) * character.point2dist * xquad)#Determine the Location of X and Y of points
+    point2y = character.y - (math.sin(math.radians(referenceangle)) * character.point2dist * yquad)
 
     #Calculate Point 3
     referenceangle, xquad, yquad = findreferneceangle(character.direction)#Find the Reference angle and Quadrant
-    point3x = character.x + (math.cos(math.radians(referenceangle)) * point3dist * xquad)#Determine the Location of X and Y of points
-    point3y = character.y - (math.sin(math.radians(referenceangle)) * point3dist * yquad)
+    point3x = character.x + (math.cos(math.radians(referenceangle)) * character.point3dist * xquad)#Determine the Location of X and Y of points
+    point3y = character.y - (math.sin(math.radians(referenceangle)) * character.point3dist * yquad)
 
     #Draw Player
     playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((point1x, point1y), (point2x, point2y), (point3x, point3y)))
