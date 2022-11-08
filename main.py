@@ -12,7 +12,9 @@ class player:
     def __init__(self):
         self.x = 400
         self.y = 400
-        self.velocitymult = 0.1
+        self.velocitymult = 0.15
+        self.brakerate = 0.95
+        self.maxspeed = 20
         self.xvelocity = 0
         self.yvelocity = 0
         self.direction = 90
@@ -31,22 +33,29 @@ class player:
     def thrust(self):
         referenceangle, xquad, yquad = findreferneceangle(self.direction)
         self.xvelocity += (math.cos(math.radians(referenceangle)) * xquad * self.velocitymult)
+        if abs(self.xvelocity) > self.maxspeed:
+            if self.xvelocity > 0:
+                self.xvelocity = 20
+            if self.xvelocity < 0:
+                self.xvelocity = -20
         self.yvelocity -= (math.sin(math.radians(referenceangle)) * yquad * self.velocitymult)
+        if abs(self.yvelocity) > self.maxspeed:
+            if self.yvelocity > 0:
+                self.yvelocity = 20
+            if self.yvelocity < 0:
+                self.yvelocity = -20
 
     def updatelocation(self):
         self.x += self.xvelocity
         self.y += self.yvelocity
 
     def brake(self):
-        referenceangle, xquad, yquad = findreferneceangle(self.direction)
-        if self.xvelocity * xquad < 0:
-            self.xvelocity *= (math.cos(math.radians(referenceangle)) * xquad)
-        if self.yvelocity * yquad < 0:
-            self.yvelocity *= (math.sin(math.radians(referenceangle)) * yquad)
+            self.xvelocity *= self.brakerate
+            self.yvelocity *= self.brakerate
 
-    def fire(self):
-        #Make this Fire off Bullets
-        pass
+    def fire(self, bulletlist):
+        bulletlist.append(bullet(10, 0, 300, 300))
+        return bulletlist
 
 #Bullets shot from Player
 class bullet:
@@ -55,6 +64,10 @@ class bullet:
         self.yvelocity = yvelocity
         self.x = x
         self.y = y
+
+    def updatelocation(self):
+        self.x += self.xvelocity
+        self.y += self.yvelocity
 
 #Asteroid
 class asteroid:
@@ -80,6 +93,7 @@ def main():
         thrusting = False
         braking = False
         firing = False
+        bulletlist = []
         #Create Player
         character = player()
 
@@ -137,10 +151,10 @@ def main():
             clock.tick(30)
 
             #Do Calculations
-            calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing)
+            calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist)
             tickcounter += tickspeed
 
-def calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing):
+def calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist):
     screen.fill(background_colour)
     #Calculate Movement
     if leftpressed:
@@ -151,9 +165,13 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
         character.thrust()
     if braking:
         character.brake()
+    if firing:
+        bulletlist = character.fire(bulletlist)
 
-    #Move Player
+    #Move Objects
     character.updatelocation()
+    for bullet in bulletlist:
+        bullet.updatelocation()
 
     #Draw Player
     #How far is each point from the center point
@@ -184,6 +202,10 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
 
     #Draw Player
     playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((point1x, point1y), (point2x, point2y), (point3x, point3y)))
+
+    #Draw Bullets
+    for bullet in bulletlist:
+        pygame.draw.circle(screen, (255, 255, 255), (bullet.x, bullet.y), 2)
 
     pygame.display.update()
 
