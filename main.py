@@ -181,6 +181,9 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
     character.updatelocation()
     for bullet in bulletlist:
         bullet.updatelocation()
+        #Check for Out Of Bounds
+        if bullet.x < -10 or bullet.x > 810 or bullet.y < -10 or bullet.y > 810:
+            bulletlist.remove(bullet)
 
     #Draw Player
     #How far is each point from the center point
