@@ -188,7 +188,7 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
     for bullet in bulletlist:
         bullet.updatelocation()
         #Check for Out Of Bounds
-        if bullet.x < -10 or bullet.x > 810 or bullet.y < -10 or bullet.y > 810:
+        if bullet.x < -20 or bullet.x > 820 or bullet.y < -20 or bullet.y > 820:
             bulletlist.remove(bullet)
 
     #Draw Player
