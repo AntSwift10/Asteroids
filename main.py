@@ -22,6 +22,7 @@ class player:
         self.point1dist = 10
         self.point2dist = 10
         self.point3dist = 20
+        self.firecooldown = 5
 
     def leftturn(self):
         self.direction += self.rotatespeed
@@ -51,19 +52,24 @@ class player:
     def updatelocation(self):
         self.x += self.xvelocity
         self.y += self.yvelocity
+        if self.firecooldown > 0:
+            self.firecooldown -= 1
 
     def brake(self):
             self.xvelocity *= self.brakerate
             self.yvelocity *= self.brakerate
 
     def fire(self, bulletlist):
-        #X Velocity, Y Velocity, X, Y
-        referenceangle, xquad, yquad = findreferneceangle(self.direction)#Find the Reference angle and Quadrant
-        xvelocity = math.cos(math.radians(referenceangle)) * (self.point3dist - 4) * xquad#Find Speed
-        yvelocity = math.sin(math.radians(referenceangle)) * (self.point3dist - 4) * yquad
-        pointx = self.x + xvelocity#Determine the Location of X and Y of points
-        pointy = self.y - yvelocity
-        bulletlist.append(bullet((1 * xvelocity), (-1 * yvelocity), pointx, pointy))
+        #Only Fire of Cooldown is 0
+        if self.firecooldown == 0:
+            referenceangle, xquad, yquad = findreferneceangle(self.direction)#Find the Reference angle and Quadrant
+            xvelocity = math.cos(math.radians(referenceangle)) * (self.point3dist - 4) * xquad#Find Speed
+            yvelocity = math.sin(math.radians(referenceangle)) * (self.point3dist - 4) * yquad
+            pointx = self.x + xvelocity#Determine the Location of X and Y of points
+            pointy = self.y - yvelocity
+            bulletlist.append(bullet((1 * xvelocity), (-1 * yvelocity), pointx, pointy))
+            self.firecooldown = 5
+            return bulletlist
         return bulletlist
 
 #Bullets shot from Player
