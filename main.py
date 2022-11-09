@@ -54,6 +54,15 @@ class player:
         self.y += self.yvelocity
         if self.firecooldown > 0:
             self.firecooldown -= 1
+        #Warp if go off Screen
+        if self.x < -20:
+            self.x = 820
+        if self.x > 820:
+            self.x = -20
+        if self.y < -20:
+            self.y = 820
+        if self.y > 820:
+            self.y = -20
 
     def brake(self):
             self.xvelocity *= self.brakerate
@@ -79,6 +88,7 @@ class bullet:
         self.yvelocity = yvelocity
         self.x = x
         self.y = y
+        self.livecount = 60
 
     def updatelocation(self):
         self.x += self.xvelocity
@@ -86,8 +96,16 @@ class bullet:
 
 #Asteroid
 class asteroid:
-    def __init__(self, size):
+    def __init__(self, size, xvelocity, yvelocity, x, y):
         self.size = size
+        self.xvelocity = xvelocity
+        self.yvelocity = yvelocity
+        self.x = x
+        self.y = y
+
+    def updatelocation(self):
+        self.x += self.xvelocity
+        self.y += self.yvelocity
 
     def shatter(self):
         #Create more, Smaller Asteroids
@@ -109,6 +127,8 @@ def main():
         braking = False
         firing = False
         bulletlist = []
+        asteroidlist = []
+        spawnchance = 50
         #Create Player
         character = player()
 
@@ -166,11 +186,29 @@ def main():
             clock.tick(30)
 
             #Do Calculations
-            calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist)
+            spawnchance, bulletlist, asteroidlist = calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, tickcounter)
             tickcounter += tickspeed
 
-def calculate(screen, background_colour, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist):
+def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, tickcounter):
     screen.fill(background_colour)
+    #Increment Spawn Chance Occasionally
+    if tickcounter % 300 == 0:
+        spawnchance += 5
+
+    #Spawn Asteroids Occasionally
+    if tickcounter % 30 == 0:
+        if random.randrange(0, 100) < spawnchance:
+            #Spawn on Random Side
+            side = random.randrange(0, 4)
+            if side == 0:
+                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), random.randrange(-20, 820), -20))
+            if side == 1:
+                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), random.randrange(-20, 820), 820))
+            if side == 2:
+                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), -20, random.randrange(-20, 820)))
+            if side == 3:
+                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), 820, random.randrange(-20, 820)))
+
     #Calculate Movement
     if leftpressed:
         character.leftturn()
@@ -183,13 +221,35 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
     if firing:
         bulletlist = character.fire(bulletlist)
 
-    #Move Objects
+    #Update Objects
     character.updatelocation()
     for bullet in bulletlist:
         bullet.updatelocation()
-        #Check for Out Of Bounds
-        if bullet.x < -20 or bullet.x > 820 or bullet.y < -20 or bullet.y > 820:
+        bullet.livecount -= 1
+        if bullet.livecount == 0:
             bulletlist.remove(bullet)
+        #Check for Out Of Bounds
+        if bullet.x < -20:
+            bullet.x = 820
+        if bullet.x > 820:
+            bullet.x = -20
+        if bullet.y < -20:
+            bullet.y = 820
+        if bullet.y > 820:
+            bullet.y = -20
+        pygame.draw.circle(screen, (255, 255, 255), (bullet.x, bullet.y), 2)
+    for asteroidobject in asteroidlist:
+        asteroidobject.updatelocation()
+        #Check for Out Of Bounds
+        if asteroidobject.x < -20:
+            asteroidobject.x = 820
+        if asteroidobject.x > 820:
+            asteroidobject.x = -20
+        if asteroidobject.y < -20:
+            asteroidobject.y = 820
+        if asteroidobject.y > 820:
+            asteroidobject.y = -20
+        pygame.draw.circle(screen, (128, 128, 128), (asteroidobject.x, asteroidobject.y), asteroidobject.size)
 
     #Draw Player
     #How far is each point from the center point
@@ -218,11 +278,9 @@ def calculate(screen, background_colour, character, leftpressed, rightpressed, t
     #Draw Player
     playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((point1x, point1y), (point2x, point2y), (point3x, point3y)))
 
-    #Draw Bullets
-    for bullet in bulletlist:
-        pygame.draw.circle(screen, (255, 255, 255), (bullet.x, bullet.y), 2)
-
     pygame.display.update()
+
+    return spawnchance, bulletlist, asteroidlist
 
 def findreferneceangle(angle):
     #Find the Reference Angle
