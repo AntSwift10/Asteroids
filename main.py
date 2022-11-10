@@ -108,9 +108,12 @@ class asteroid:
         self.x += self.xvelocity
         self.y += self.yvelocity
 
-    def shatter(self):
+    def shatter(self, asteroidlist):
         #Create more, Smaller Asteroids
-        pass
+        if self.size > 10:
+            asteroidlist.append(asteroid(self.size * random.uniform(0.3, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x, self.y))
+            asteroidlist.append(asteroid(self.size * random.uniform(0.3, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x, self.y))
+        return asteroidlist
 
 #Functions
 def main():
@@ -225,6 +228,7 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
     #Update Objects
     character.updatelocation()
     for bullet in bulletlist:
+        collision = False
         bullet.updatelocation()
         bullet.livecount -= 1
         #Check for Out Of Bounds
@@ -241,7 +245,11 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
             if math.sqrt(pow(abs(bullet.x - asteroidobject.x), 2) + pow(abs(bullet.y - asteroidobject.y), 2)) <= (bullet.size + asteroidobject.size):
                 #Detected collision
                 bulletlist.remove(bullet)
-        if bullet.livecount == 0:
+                asteroidobject.shatter(asteroidlist)
+                asteroidlist.remove(asteroidobject)
+                collision = True
+                break
+        if bullet.livecount == 0 and collision == False:
             bulletlist.remove(bullet)
         pygame.draw.circle(screen, (255, 255, 255), (bullet.x, bullet.y), bullet.size)
     for asteroidobject in asteroidlist:
