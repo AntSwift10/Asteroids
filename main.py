@@ -89,6 +89,7 @@ class bullet:
         self.x = x
         self.y = y
         self.livecount = 60
+        self.size = 2
 
     def updatelocation(self):
         self.x += self.xvelocity
@@ -226,8 +227,6 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
     for bullet in bulletlist:
         bullet.updatelocation()
         bullet.livecount -= 1
-        if bullet.livecount == 0:
-            bulletlist.remove(bullet)
         #Check for Out Of Bounds
         if bullet.x < -20:
             bullet.x = 820
@@ -237,7 +236,14 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
             bullet.y = 820
         if bullet.y > 820:
             bullet.y = -20
-        pygame.draw.circle(screen, (255, 255, 255), (bullet.x, bullet.y), 2)
+        #Check for Collision Detection
+        for asteroidobject in asteroidlist:
+            if math.sqrt(pow(abs(bullet.x - asteroidobject.x), 2) + pow(abs(bullet.y - asteroidobject.y), 2)) <= (bullet.size + asteroidobject.size):
+                #Detected collision
+                bulletlist.remove(bullet)
+        if bullet.livecount == 0:
+            bulletlist.remove(bullet)
+        pygame.draw.circle(screen, (255, 255, 255), (bullet.x, bullet.y), bullet.size)
     for asteroidobject in asteroidlist:
         asteroidobject.updatelocation()
         #Check for Out Of Bounds
@@ -276,7 +282,7 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
     point3y = character.y - (math.sin(math.radians(referenceangle)) * character.point3dist * yquad)
 
     #Draw Player
-    playercollide = pygame.draw.polygon(screen, (255, 255, 255), ((point1x, point1y), (point2x, point2y), (point3x, point3y)))
+    pygame.draw.polygon(screen, (255, 255, 255), ((point1x, point1y), (point2x, point2y), (point3x, point3y)))
 
     pygame.display.update()
 
