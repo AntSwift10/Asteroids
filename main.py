@@ -111,8 +111,10 @@ class asteroid:
     def shatter(self, asteroidlist):
         #Create more, Smaller Asteroids
         if self.size > 10:
-            asteroidlist.append(asteroid(self.size * random.uniform(0.3, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x, self.y))
-            asteroidlist.append(asteroid(self.size * random.uniform(0.3, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x, self.y))
+            n = 0
+            while n < random.randrange(2, 4):
+                asteroidlist.append(asteroid(self.size * random.uniform(0.5, 0.8), random.uniform(-1, 1), random.uniform(-1, 1), self.x + random.uniform(-self.size / 2, self.size / 2), self.y + random.uniform(-self.size / 2, self.size / 2)))
+                n += 1
         return asteroidlist
 
 #Functions
@@ -205,13 +207,13 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
             #Spawn on Random Side
             side = random.randrange(0, 4)
             if side == 0:
-                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), random.randrange(-20, 820), -20))
+                asteroidlist.append(asteroid(random.randrange(20, 40), random.uniform(-1, 1), random.uniform(-1, 1), random.randrange(-40, 840), -40))
             if side == 1:
-                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), random.randrange(-20, 820), 820))
+                asteroidlist.append(asteroid(random.randrange(20, 40), random.uniform(-1, 1), random.uniform(-1, 1), random.randrange(-40, 840), 840))
             if side == 2:
-                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), -20, random.randrange(-20, 820)))
+                asteroidlist.append(asteroid(random.randrange(20, 40), random.uniform(-1, 1), random.uniform(-1, 1), -40, random.randrange(-40, 840)))
             if side == 3:
-                asteroidlist.append(asteroid(20, random.uniform(-1, 1), random.uniform(-1, 1), 820, random.randrange(-20, 820)))
+                asteroidlist.append(asteroid(random.randrange(20, 40), random.uniform(-1, 1), random.uniform(-1, 1), 840, random.randrange(-40, 840)))
 
     #Calculate Movement
     if leftpressed:
@@ -255,14 +257,14 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
     for asteroidobject in asteroidlist:
         asteroidobject.updatelocation()
         #Check for Out Of Bounds
-        if asteroidobject.x < -20:
-            asteroidobject.x = 820
-        if asteroidobject.x > 820:
-            asteroidobject.x = -20
-        if asteroidobject.y < -20:
-            asteroidobject.y = 820
-        if asteroidobject.y > 820:
-            asteroidobject.y = -20
+        if asteroidobject.x < -40:
+            asteroidobject.x = 840
+        if asteroidobject.x > 840:
+            asteroidobject.x = -40
+        if asteroidobject.y < -40:
+            asteroidobject.y = 840
+        if asteroidobject.y > 840:
+            asteroidobject.y = -40
         pygame.draw.circle(screen, (128, 128, 128), (asteroidobject.x, asteroidobject.y), asteroidobject.size)
 
     #Draw Player
