@@ -22,7 +22,8 @@ class player:
         self.point1dist = 10
         self.point2dist = 10
         self.point3dist = 20
-        self.firecooldown = 5
+        self.maxcooldown = 5
+        self.firecooldown = self.maxcooldown
 
     def leftturn(self):
         self.direction += self.rotatespeed
@@ -77,7 +78,7 @@ class player:
             pointx = self.x + xvelocity#Determine the Location of X and Y of points
             pointy = self.y - yvelocity
             bulletlist.append(bullet((1 * xvelocity), (-1 * yvelocity), pointx, pointy))
-            self.firecooldown = 5
+            self.firecooldown = self.maxcooldown
             return bulletlist
         return bulletlist
 
@@ -110,7 +111,7 @@ class asteroid:
 
     def shatter(self, asteroidlist):
         #Create more, Smaller Asteroids
-        if self.size > 10:
+        if self.size > 15:
             n = 0
             while n < random.randrange(2, 4):
                 asteroidlist.append(asteroid(self.size * random.uniform(0.5, 0.8), random.uniform(-1, 1), random.uniform(-1, 1), self.x + random.uniform(-self.size / 2, self.size / 2), self.y + random.uniform(-self.size / 2, self.size / 2)))
