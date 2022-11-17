@@ -104,6 +104,7 @@ class asteroid:
         self.yvelocity = yvelocity
         self.x = x
         self.y = y
+        self.mask = None
 
     def updatelocation(self):
         self.x += self.xvelocity
@@ -198,7 +199,6 @@ def main():
 
 def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, tickcounter):
     screen.fill(background_colour)
-    asteroidmasks = []
     #Increment Spawn Chance Occasionally
     if tickcounter % 300 == 0:
         spawnchance += 5
@@ -271,7 +271,7 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
         asteroidsurface = pygame.Surface((100, 100), pygame.SRCALPHA)
         pygame.draw.circle(asteroidsurface, (128, 128, 128), (50, 50), asteroidobject.size)
         screen.blit(asteroidsurface, (asteroidobject.x - 50, asteroidobject.y - 50))
-        asteroidmasks.append(pygame.mask.from_surface(asteroidsurface))
+        asteroidobject.mask = pygame.mask.from_surface(asteroidsurface)
 
     #Draw Player
     #How far is each point from the center point
@@ -304,6 +304,16 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
 
     #Create a Mask for Collision Detection
     mask_player = pygame.mask.from_surface(playersurface)
+
+    #Player, Asteroid Collision Detection
+    for asteroidobject in asteroidlist:
+        offset = asteroidobject.x - character.x, asteroidobject.y - character.y
+        collision = mask_player.overlap(asteroidobject.mask, offset)
+        if collision != None:
+            if random.randrange(0, 10) > 5:
+                print("Hit")
+            else:
+                print("Gameover!")
 
     pygame.display.update()
 
