@@ -114,7 +114,7 @@ class asteroid:
         if self.size > 15:
             n = 0
             while n < random.randrange(2, 4):
-                asteroidlist.append(asteroid(self.size * random.uniform(0.5, 0.8), random.uniform(-1, 1), random.uniform(-1, 1), self.x + random.uniform(-self.size / 2, self.size / 2), self.y + random.uniform(-self.size / 2, self.size / 2)))
+                asteroidlist.append(asteroid(self.size * random.uniform(0.5, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x + random.uniform(-self.size / 2, self.size / 2), self.y + random.uniform(-self.size / 2, self.size / 2)))
                 n += 1
         return asteroidlist
 
@@ -198,6 +198,7 @@ def main():
 
 def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, tickcounter):
     screen.fill(background_colour)
+    asteroidmasks = []
     #Increment Spawn Chance Occasionally
     if tickcounter % 300 == 0:
         spawnchance += 5
@@ -266,7 +267,11 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
             asteroidobject.y = 840
         if asteroidobject.y > 840:
             asteroidobject.y = -40
-        pygame.draw.circle(screen, (128, 128, 128), (asteroidobject.x, asteroidobject.y), asteroidobject.size)
+        #Draw and Create Masks for Collision Detection
+        asteroidsurface = pygame.Surface((100, 100), pygame.SRCALPHA)
+        pygame.draw.circle(asteroidsurface, (128, 128, 128), (50, 50), asteroidobject.size)
+        screen.blit(asteroidsurface, (asteroidobject.x - 50, asteroidobject.y - 50))
+        asteroidmasks.append(pygame.mask.from_surface(asteroidsurface))
 
     #Draw Player
     #How far is each point from the center point
@@ -293,7 +298,12 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
     point3y = character.y - (math.sin(math.radians(referenceangle)) * character.point3dist * yquad)
 
     #Draw Player
-    pygame.draw.polygon(screen, (255, 255, 255), ((point1x, point1y), (point2x, point2y), (point3x, point3y)))
+    playersurface = pygame.Surface((60, 60), pygame.SRCALPHA)
+    pygame.draw.polygon(playersurface, (255, 255, 255), ((point1x + 30 - character.x, point1y + 30 - character.y), (point2x + 30 - character.x, point2y + 30 - character.y), (point3x + 30 - character.x, point3y + 30 - character.y)))
+    screen.blit(playersurface, (character.x - 30, character.y - 30))
+
+    #Create a Mask for Collision Detection
+    mask_player = pygame.mask.from_surface(playersurface)
 
     pygame.display.update()
 
