@@ -307,7 +307,7 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
 
     #Player, Asteroid Collision Detection
     for asteroidobject in asteroidlist:
-        offset = asteroidobject.x - character.x, asteroidobject.y - character.y
+        offset = (asteroidobject.x - 50) - (character.x - 30), (asteroidobject.y - 50) - (character.y - 30)
         collision = mask_player.overlap(asteroidobject.mask, offset)
         if collision != None:
             if random.randrange(0, 10) > 5:
