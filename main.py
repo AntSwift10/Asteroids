@@ -126,6 +126,7 @@ def main():
     background_colour = (0, 0, 0)
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Asteroids")
+    font = pygame.font.SysFont("Cambria.ttc", 30)
     #This is to Reset after a Gameover
     cont = True
     while cont:
@@ -194,10 +195,10 @@ def main():
             clock.tick(30)
 
             #Do Calculations
-            spawnchance, bulletlist, asteroidlist = calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, tickcounter)
+            spawnchance, bulletlist, asteroidlist, cont, running = calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, font, cont, running, tickcounter)
             tickcounter += tickspeed
 
-def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, tickcounter):
+def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, font, cont, running, tickcounter):
     screen.fill(background_colour)
     #Increment Spawn Chance Occasionally
     if tickcounter % 300 == 0:
@@ -310,14 +311,11 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
         offset = (asteroidobject.x - 50) - (character.x - 30), (asteroidobject.y - 50) - (character.y - 30)
         collision = mask_player.overlap(asteroidobject.mask, offset)
         if collision != None:
-            if random.randrange(0, 10) > 5:
-                print("Hit")
-            else:
-                print("Gameover!")
+            cont, running = gameover(screen, font)
 
     pygame.display.update()
 
-    return spawnchance, bulletlist, asteroidlist
+    return spawnchance, bulletlist, asteroidlist, cont, running
 
 def findreferneceangle(angle):
     #Find the Reference Angle
@@ -343,6 +341,39 @@ def findreferneceangle(angle):
         referenceangle = 360 - angle
 
     return referenceangle, xquad, yquad
+
+def gameover(screen, font):
+    bigfont = pygame.font.SysFont("Cambria.ttc", 100)
+    quittext = font.render("Quit?", True, (255, 255, 255))
+    continuetext = font.render("Try Again?", True, (255, 255, 255))
+    gameovertext = bigfont.render("GAMEOVER", True, (255, 50, 50))
+    quitbutt = pygame.draw.rect(screen, (255, 50, 50), (170, 472, 150, 75))
+    continuebutt = pygame.draw.rect(screen, (255, 50, 50), (475, 472, 150, 75))
+    #Game Over Loop
+    running = True
+    while running:
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (255, 50, 50), (475, 472, 150, 75))
+        pygame.draw.rect(screen, (255, 50, 50), (170, 472, 150, 75))
+        screen.blit(gameovertext, (200, 200))
+        screen.blit(quittext, (220, 500))
+        screen.blit(continuetext, (500, 500))
+        #Check for User Input
+        for event in pygame.event.get():
+            #Detected User Clicked on X
+            if event.type == pygame.QUIT:
+                quit()
+                #Detected Mouse Click
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                #Left Click
+                if event.button == 1:
+                    pos = pygame.mouse.get_pos()
+                    if quitbutt.collidepoint(pos):
+                        quit()
+                    elif continuebutt.collidepoint(pos):
+                        return True, False
+        
+        pygame.display.update()
 
 #Call main() to Start Program
 main()
