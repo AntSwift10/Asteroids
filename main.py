@@ -12,6 +12,8 @@ class player:
     def __init__(self):
         self.x = 400
         self.y = 400
+        self.firingspeedpowerups = 4
+        self.multishotpowerups = 4
         self.velocitymult = 0.15
         self.brakerate = 0.95
         self.maxspeed = 20
@@ -22,8 +24,55 @@ class player:
         self.point1dist = 10
         self.point2dist = 10
         self.point3dist = 20
-        self.maxcooldown = 5
+        match self.firingspeedpowerups:
+            case 0:
+                self.maxcooldown = 20
+            case 1:
+                self.maxcooldown = 10
+            case 2:
+                self.maxcooldown = 5
+            case 3:
+                self.maxcooldown = 2
+            case 4:
+                self.maxcooldown = 1
         self.firecooldown = self.maxcooldown
+
+    def fire(self, bulletlist):
+        #Only Fire if Cooldown is 0
+        if self.firecooldown == 0:
+            #Fire Based on Number of Power Ups
+            match self.multishotpowerups:
+                case 0:
+                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist)
+                    self.firecooldown = self.maxcooldown
+                    return bulletlist
+                case 1:
+                    bulletlist = firebullet(self.direction - 2, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction + 2, self.x, self.y, self.point3dist, bulletlist)
+                    self.firecooldown = self.maxcooldown
+                    return bulletlist
+                case 2:
+                    bulletlist = firebullet(self.direction - 3, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction + 3, self.x, self.y, self.point3dist, bulletlist)
+                    self.firecooldown = self.maxcooldown
+                    return bulletlist
+                case 3:
+                    bulletlist = firebullet(self.direction - 6, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction - 2, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction + 2, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction + 6, self.x, self.y, self.point3dist, bulletlist)
+                    self.firecooldown = self.maxcooldown
+                    return bulletlist
+                case 4:
+                    bulletlist = firebullet(self.direction - 6, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction - 3, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction + 3, self.x, self.y, self.point3dist, bulletlist)
+                    bulletlist = firebullet(self.direction + 6, self.x, self.y, self.point3dist, bulletlist)
+                    self.firecooldown = self.maxcooldown
+                    return bulletlist
+        return bulletlist
 
     def leftturn(self):
         self.direction += self.rotatespeed
@@ -68,19 +117,6 @@ class player:
     def brake(self):
             self.xvelocity *= self.brakerate
             self.yvelocity *= self.brakerate
-
-    def fire(self, bulletlist):
-        #Only Fire of Cooldown is 0
-        if self.firecooldown == 0:
-            referenceangle, xquad, yquad = findreferneceangle(self.direction)#Find the Reference angle and Quadrant
-            xvelocity = math.cos(math.radians(referenceangle)) * (self.point3dist - 4) * xquad#Find Speed
-            yvelocity = math.sin(math.radians(referenceangle)) * (self.point3dist - 4) * yquad
-            pointx = self.x + xvelocity#Determine the Location of X and Y of points
-            pointy = self.y - yvelocity
-            bulletlist.append(bullet((1 * xvelocity), (-1 * yvelocity), pointx, pointy))
-            self.firecooldown = self.maxcooldown
-            return bulletlist
-        return bulletlist
 
 #Bullets shot from Player
 class bullet:
@@ -341,6 +377,19 @@ def findreferneceangle(angle):
         referenceangle = 360 - angle
 
     return referenceangle, xquad, yquad
+
+def firebullet(angle, x, y, point3dist, bulletlist):
+    if angle > 360:
+        angle -= 360
+    if angle <= 0:
+        angle += 360
+    referenceangle, xquad, yquad = findreferneceangle(angle)#Find the Reference angle and Quadrant
+    xvelocity = math.cos(math.radians(referenceangle)) * (point3dist - 4) * xquad#Find Speed
+    yvelocity = math.sin(math.radians(referenceangle)) * (point3dist - 4) * yquad
+    pointx = x + xvelocity#Determine the Location of X and Y of points
+    pointy = y - yvelocity
+    bulletlist.append(bullet((1 * xvelocity), (-1 * yvelocity), pointx, pointy))
+    return bulletlist
 
 def gameover(screen, font):
     bigfont = pygame.font.SysFont("Cambria.ttc", 100)
