@@ -12,9 +12,9 @@ class player:
     def __init__(self):
         self.x = 400
         self.y = 400
-        self.firingspeedpowerups = 4
-        self.multishotpowerups = 4
-        self.rangepowerups = 60
+        self.firingspeedpowerups = 0
+        self.multishotpowerups = 0
+        self.rangepowerups = 5
         self.velocitymult = 0.15
         self.brakerate = 0.95
         self.maxspeed = 20
@@ -174,7 +174,7 @@ def main():
         firing = False
         bulletlist = []
         asteroidlist = []
-        spawnchance = 50
+        spawnchance = 5
         #Create Player
         character = player()
 
