@@ -14,7 +14,18 @@ class player:
         self.y = 400
         self.firingspeedpowerups = 0
         self.multishotpowerups = 0
-        self.rangepowerups = 5
+        self.rangepowerups = 0
+        match self.rangepowerups:
+            case 0:
+                self.range = 5
+            case 1:
+                self.range = 15
+            case 2:
+                self.range = 30
+            case 3:
+                self.range = 60
+            case _:
+                self.range = 100
         self.velocitymult = 0.15
         self.brakerate = 0.95
         self.maxspeed = 20
@@ -34,7 +45,7 @@ class player:
                 self.maxcooldown = 5
             case 3:
                 self.maxcooldown = 2
-            case 4:
+            case _:
                 self.maxcooldown = 1
         self.firecooldown = self.maxcooldown
 
@@ -44,36 +55,60 @@ class player:
             #Fire Based on Number of Power Ups
             match self.multishotpowerups:
                 case 0:
-                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
+                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist, self.range)
                     self.firecooldown = self.maxcooldown
                     return bulletlist
                 case 1:
-                    bulletlist = firebullet(self.direction - 2, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction + 2, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
+                    bulletlist = firebullet(self.direction - 2, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction + 2, self.x, self.y, self.point3dist, bulletlist, self.range)
                     self.firecooldown = self.maxcooldown
                     return bulletlist
                 case 2:
-                    bulletlist = firebullet(self.direction - 3, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction + 3, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
+                    bulletlist = firebullet(self.direction - 3, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction + 3, self.x, self.y, self.point3dist, bulletlist, self.range)
                     self.firecooldown = self.maxcooldown
                     return bulletlist
                 case 3:
-                    bulletlist = firebullet(self.direction - 6, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction - 2, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction + 2, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction + 6, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
+                    bulletlist = firebullet(self.direction - 6, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction - 2, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction + 2, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction + 6, self.x, self.y, self.point3dist, bulletlist, self.range)
                     self.firecooldown = self.maxcooldown
                     return bulletlist
-                case 4:
-                    bulletlist = firebullet(self.direction - 6, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction - 3, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction + 3, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
-                    bulletlist = firebullet(self.direction + 6, self.x, self.y, self.point3dist, bulletlist, self.rangepowerups)
+                case _:
+                    bulletlist = firebullet(self.direction - 6, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction - 3, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction + 3, self.x, self.y, self.point3dist, bulletlist, self.range)
+                    bulletlist = firebullet(self.direction + 6, self.x, self.y, self.point3dist, bulletlist, self.range)
                     self.firecooldown = self.maxcooldown
                     return bulletlist
         return bulletlist
+
+    def updatepowerlevel(self):
+        match self.rangepowerups:
+            case 0:
+                self.range = 5
+            case 1:
+                self.range = 15
+            case 2:
+                self.range = 30
+            case 3:
+                self.range = 60
+            case _:
+                self.range = 100
+        match self.firingspeedpowerups:
+            case 0:
+                self.maxcooldown = 20
+            case 1:
+                self.maxcooldown = 10
+            case 2:
+                self.maxcooldown = 5
+            case 3:
+                self.maxcooldown = 2
+            case _:
+                self.maxcooldown = 1
 
     def leftturn(self):
         self.direction += self.rotatespeed
@@ -147,14 +182,39 @@ class asteroid:
         self.x += self.xvelocity
         self.y += self.yvelocity
 
-    def shatter(self, asteroidlist):
+    def shatter(self, asteroidlist, poweruplist):
         #Create more, Smaller Asteroids
         if self.size > 15:
             n = 0
             while n < random.randrange(2, 4):
                 asteroidlist.append(asteroid(self.size * random.uniform(0.5, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x + random.uniform(-self.size / 2, self.size / 2), self.y + random.uniform(-self.size / 2, self.size / 2)))
                 n += 1
-        return asteroidlist
+        #Chance to Create Powerups
+        number = random.randrange(31)
+        if number <= 2:
+            poweruplist.append(powerup(self.x, self.y, number))
+        return asteroidlist, poweruplist
+
+#Power Ups
+class powerup:
+    def __init__(self, x, y, type):
+        self.x = x
+        self.y = y
+        self.type = type
+        self.size = 10
+        self.mask = None
+        self.xvelocity = random.uniform(-1, 1)
+        self.yvelocity = random.uniform(-1, 1)
+        if type == 0: #Multi Shot
+            self.colour = (255, 0, 0)
+        if type == 1: #Fire Rate
+            self.colour = (0, 255, 0)
+        if type == 2:#Range
+            self.colour = (0, 0, 255)
+
+    def updatelocation(self):
+        self.x += self.xvelocity
+        self.y += self.yvelocity
 
 #Functions
 def main():
@@ -174,6 +234,7 @@ def main():
         firing = False
         bulletlist = []
         asteroidlist = []
+        poweruplist = []
         spawnchance = 5
         #Create Player
         character = player()
@@ -232,10 +293,10 @@ def main():
             clock.tick(30)
 
             #Do Calculations
-            spawnchance, bulletlist, asteroidlist, cont, running = calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, font, cont, running, tickcounter)
+            spawnchance, bulletlist, asteroidlist, cont, running, poweruplist = calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, font, cont, running, tickcounter, poweruplist)
             tickcounter += tickspeed
 
-def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, font, cont, running, tickcounter):
+def calculate(screen, background_colour, spawnchance, asteroidlist, character, leftpressed, rightpressed, thrusting, braking, firing, bulletlist, font, cont, running, tickcounter, poweruplist):
     screen.fill(background_colour)
     #Increment Spawn Chance Occasionally
     if tickcounter % 300 == 0:
@@ -287,7 +348,7 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
             if math.sqrt(pow(abs(bullet.x - asteroidobject.x), 2) + pow(abs(bullet.y - asteroidobject.y), 2)) <= (bullet.size + asteroidobject.size):
                 #Detected collision
                 bulletlist.remove(bullet)
-                asteroidobject.shatter(asteroidlist)
+                asteroidobject.shatter(asteroidlist, poweruplist)
                 asteroidlist.remove(asteroidobject)
                 collision = True
                 break
@@ -310,6 +371,20 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
         pygame.draw.circle(asteroidsurface, (128, 128, 128), (50, 50), asteroidobject.size)
         screen.blit(asteroidsurface, (asteroidobject.x - 50, asteroidobject.y - 50))
         asteroidobject.mask = pygame.mask.from_surface(asteroidsurface)
+    for powerupobject in poweruplist:
+        powerupobject.updatelocation()
+        if powerupobject.x < -20:
+            powerupobject.x = 820
+        if powerupobject.x > 820:
+            powerupobject.x = -20
+        if powerupobject.y < -20:
+            powerupobject.y = 820
+        if powerupobject.y > 820:
+            powerupobject.y = -20
+        powerupsurface = pygame.Surface((30, 30), pygame.SRCALPHA)
+        pygame.draw.rect(powerupsurface, powerupobject.colour, (15, 15, powerupobject.size, powerupobject.size))
+        screen.blit(powerupsurface, (powerupobject.x - 15, powerupobject.y - 15))
+        powerupobject.mask = pygame.mask.from_surface(powerupsurface)
 
     #Draw Player
     #How far is each point from the center point
@@ -350,9 +425,24 @@ def calculate(screen, background_colour, spawnchance, asteroidlist, character, l
         if collision != None:
             cont, running = gameover(screen, font)
 
+    #Player, Powerup Collision
+    for powerupobject in poweruplist:
+        offset = (powerupobject.x - 15) - (character.x - 30), (powerupobject.y - 15) - (character.y - 30)
+        collision = mask_player.overlap(powerupobject.mask, offset)
+        if collision != None:
+            match powerupobject.type:
+                case 0: #Multi Shot
+                    character.multishotpowerups += 1
+                case 1: #Fire Rate
+                    character.firingspeedpowerups += 1
+                case 2: #Range
+                    character.rangepowerups += 1
+            poweruplist.remove(powerupobject)
+            character.updatepowerlevel()
+
     pygame.display.update()
 
-    return spawnchance, bulletlist, asteroidlist, cont, running
+    return spawnchance, bulletlist, asteroidlist, cont, running, poweruplist
 
 def findreferneceangle(angle):
     #Find the Reference Angle
