@@ -190,7 +190,7 @@ class asteroid:
                 asteroidlist.append(asteroid(self.size * random.uniform(0.5, 0.6), random.uniform(-1, 1), random.uniform(-1, 1), self.x + random.uniform(-self.size / 2, self.size / 2), self.y + random.uniform(-self.size / 2, self.size / 2)))
                 n += 1
         #Chance to Create Powerups
-        number = random.randrange(31)
+        number = random.randrange(100)
         if number <= 2:
             poweruplist.append(powerup(self.x, self.y, number))
         return asteroidlist, poweruplist
