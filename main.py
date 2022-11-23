@@ -153,6 +153,10 @@ class player:
     def brake(self):
             self.xvelocity *= self.brakerate
             self.yvelocity *= self.brakerate
+            if abs(self.xvelocity) <= 0.2:
+                self.xvelocity = 0
+            if abs(self.yvelocity) <= 0.2:
+                self.yvelocity = 0
 
 #Bullets shot from Player
 class bullet:
